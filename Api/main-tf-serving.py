@@ -23,7 +23,9 @@ app.add_middleware(
 
 endpoint = "http://localhost:8501/v1/models/potatoes_model:predict"
 
-CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
+CLASS_NAMES = ["Tomato__Target_Spot", "Tomato__Tomato_mosaic_virus", "Tomato__Tomato_YellowLeaf__Curl_Virus","Tomato_Bacterial_spot",
+                    "Tomato_Early_blight","Tomato_healthy","Tomato_Late_blight","Tomato_Leaf_Mold","Tomato_Septoria_leaf_spot"]
+
 
 @app.get("/ping")
 async def ping():
