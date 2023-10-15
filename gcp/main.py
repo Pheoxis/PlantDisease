@@ -9,8 +9,8 @@ input_index = None
 output_index = None
 
 
-Class_names = ["Tomato__Target_Spot", "Tomato__Tomato_mosaic_virus", "Tomato__Tomato_YellowLeaf__Curl_Virus","Tomato_Bacterial_spot",
-                    "Tomato_Early_blight","Tomato_healthy","Tomato_Late_blight","Tomato_Leaf_Mold","Tomato_Septoria_leaf_spot"]
+Class_names = ["Tomato_Bacterial_spot", "Tomato_Early_blight", "Tomato_Late_blight","Tomato_Leaf_Mold",
+                    "Tomato_Septoria_leaf_spot","Tomato__Target_Spot","Tomato__Tomato_YellowLeaf__Curl_Virus","Tomato__Tomato_mosaic_virus","Tomato_healthy"]
 
 Bucket_name = "tomato_disease_bucket"
 
@@ -35,9 +35,9 @@ def predict(request):
     
     image = request.files["file"]
 
-    image = np.array(Image.open(image).convert("RGB").resize((128,128)))
+    image = np.array(Image.open(image).convert("RGB"))#.resize((256,256))
 
-    image = image/127
+    #image = image/255
 
     img_array = tf.expand_dims(image, 0)
     predictions = model.predict(img_array)

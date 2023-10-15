@@ -14,10 +14,8 @@ async def my_coroutine():
 
     Model = tf.keras.models.load_model(r"C:\Users\Kamil\Desktop\PROGRAMMING\Rok4\ASI\JupyterASI\PlantDisease\saved_models1")
 
-    CLASS_NAMES = ["Tomato__Target_Spot", "Tomato__Tomato_mosaic_virus", "Tomato__Tomato_YellowLeaf__Curl_Virus",
-                   "Tomato_Bacterial_spot",
-                   "Tomato_Early_blight", "Tomato_healthy", "Tomato_Late_blight", "Tomato_Leaf_Mold",
-                   "Tomato_Septoria_leaf_spot"]
+    Class_names = ["Tomato_Bacterial_spot", "Tomato_Early_blight", "Tomato_Late_blight","Tomato_Leaf_Mold",
+                    "Tomato_Septoria_leaf_spot","Tomato__Target_Spot","Tomato__Tomato_YellowLeaf__Curl_Virus","Tomato__Tomato_mosaic_virus","Tomato_healthy"]
 
     @app.get("/ping")
     async def ping():
