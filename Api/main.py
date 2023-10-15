@@ -33,7 +33,7 @@ async def my_coroutine():
         img_batch = np.expand_dims(image, 0)
 
         prediction = Model.predict(img_batch)
-        predicted_class = CLASS_NAMES[np.argmax(prediction[0])]
+        predicted_class = Class_names[np.argmax(prediction[0])]
         confidence = np.max(prediction[0])
 
         return {
