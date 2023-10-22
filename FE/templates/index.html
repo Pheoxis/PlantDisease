@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plant Disease Detection</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            background: linear-gradient(270deg, #f01818, #00ff3c, #0055ff);
+            background-size: 600% 600%;
+            -webkit-animation: Gradient 2s ease infinite;
+            -moz-animation: Gradient 2s ease infinite;
+            animation: Gradient 2s ease infinite;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+    
+        @-webkit-keyframes Gradient {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @-moz-keyframes Gradient {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @keyframes Gradient { 
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            background-color: #a3a3a3;
+            color: #000000;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #uploadArea {
+            border: 2px solid #ccc;
+            padding: 20px;
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        #uploadButton {
+            background-color: #a3a3a3;
+            color: #000000;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 10px auto;
+            display: block;
+        }
+
+
+        #resultArea {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="gradient-animation">
+    <h1>Plant Disease Detection</h1>
+    <button id="pingButton">Ping API</button>
+    <br><br>
+    <div id="uploadArea">
+        <p>Drag & drop an image here or click to select one.</p>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    </div>
+    <br>
+    <button id="uploadButton" style="display: none;">Upload Image</button>
+    <br><br>
+    <div id="resultArea" style="display: none;">
+        <h2>Result:</h2>
+        <p>Uploaded Image: <span id="uploadedImageName"></span></p>
+        <p>Prediction: <span id="predictedClass"></span></p>
+        <p>Confidence: <span id="confidence"></span></p>
+    </div>
+
+    <script>
+        const pingButton = document.getElementById('pingButton');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const uploadArea = document.getElementById('uploadArea');
+        const resultArea = document.getElementById('resultArea');
+        const uploadedImageName = document.getElementById('uploadedImageName');
+        const predictedClass = document.getElementById('predictedClass');
+        const confidence = document.getElementById('confidence');
+
+        const preventDefaults = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const handleDrop = (e) => {
+            preventDefaults(e);
+            fileInput.files = e.dataTransfer.files;
+            uploadButton.style.display = 'block';
+        };
+
+        uploadArea.addEventListener('dragenter', preventDefaults);
+        uploadArea.addEventListener('dragover', preventDefaults);
+        uploadArea.addEventListener('drop', handleDrop);
+
+
+        pingButton.addEventListener('click', async () => {
+            const response = await fetch('http://localhost:8000/ping');
+            const data = await response.text();
+            console.log(data);
+            alert(data);
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            uploadButton.style.display = 'block';
+        });
+
+        uploadButton.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const response = await fetch('http://localhost:8000/predict', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.status === 200) {
+                const data = await response.json();
+                uploadedImageName.textContent = data.filename;
+                predictedClass.textContent = data.class;
+                confidence.textContent = data.confidence;
+                resultArea.style.display = 'block';
+            } else {
+                alert('Prediction failed. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>
