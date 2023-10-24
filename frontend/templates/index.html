@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Plant Disease Detection</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="gradient-animation">
+    <h1>Plant Disease Detection</h1>
+    <button id="pingButton">Ping API</button>
+    <br><br>
+    <div id="uploadArea">
+        <p>Drag & drop an image here or click to select one.</p>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    </div>
+    <br>
+    <button id="uploadButton" style="display: none;">Upload Image</button>
+    <br><br>
+    <div id="resultArea" style="display: none;">
+        <h2>Result:</h2>
+        <p>Uploaded Image: <span id="uploadedImageName"></span></p>
+        <p>Prediction: <span id="predictedClass"></span></p>
+        <p>Confidence: <span id="confidence"></span></p>
+    </div>
+
+    <script>
+        const pingButton = document.getElementById('pingButton');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const uploadArea = document.getElementById('uploadArea');
+        const resultArea = document.getElementById('resultArea');
+        const uploadedImageName = document.getElementById('uploadedImageName');
+        const predictedClass = document.getElementById('predictedClass');
+        const confidence = document.getElementById('confidence');
+
+        const preventDefaults = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const handleDrop = (e) => {
+            preventDefaults(e);
+            fileInput.files = e.dataTransfer.files;
+            uploadButton.style.display = 'block';
+        };
+
+        uploadArea.addEventListener('dragenter', preventDefaults);
+        uploadArea.addEventListener('dragover', preventDefaults);
+        uploadArea.addEventListener('drop', handleDrop);
+
+
+        pingButton.addEventListener('click', async () => {
+            const response = await fetch('http://localhost:8000/ping');
+            const data = await response.text();
+            console.log(data);
+            alert(data);
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            uploadButton.style.display = 'block';
+        });
+
+        uploadButton.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const response = await fetch('http://localhost:8000/predict', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.status === 200) {
+                const data = await response.json();
+                uploadedImageName.textContent = data.filename;
+                predictedClass.textContent = data.class;
+                confidence.textContent = data.confidence;
+                resultArea.style.display = 'block';
+            } else {
+                alert('Prediction failed. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>
