@@ -82,6 +82,54 @@
                 predictedClass.textContent = data.class;
                 confidence.textContent = data.confidence;
                 resultArea.style.display = 'block';
+
+                let predictedClassName = predictedClass.textContent;
+                let redirectUrl = '';
+                
+                switch (predictedClassName) {
+                    case 'Tomato_Bacterial_spot':
+                        redirectUrl = 'https://hort.extension.wisc.edu/articles/bacterial-spot-of-tomato/';
+                        break;
+                    case 'Tomato_Early_blight':
+                        redirectUrl = 'https://extension.umd.edu/resource/early-blight-tomatoes';
+                        break;
+                    case 'Tomato_Late_blight':
+                        redirectUrl = 'https://extension.wvu.edu/lawn-gardening-pests/plant-disease/fruit-vegetable-diseases/late-blight-tomatoes';
+                        break;
+                    case 'Tomato_Leaf_Mold':
+                        redirectUrl = 'https://www.lovethegarden.com/uk-en/garden-problem/tomato-leaf-mould';
+                        break;
+                    case 'Tomato_Septoria_leaf_spot':
+                        redirectUrl = 'https://www.missouribotanicalgarden.org/gardens-gardening/your-garden/help-for-the-home-gardener/advice-tips-resources/pests-and-problems/diseases/fungal-spots/septoria-leaf-spot-of-tomato';
+                        break;
+                    case 'Tomato_Target_Spot':
+                        redirectUrl = 'https://apps.lucidcentral.org/pppw_v10/text/web_full/entities/tomato_target_spot_163.htm';
+                        break;
+                    case 'Tomato_Tomato_YellowLeaf__Curl_Virus':
+                        redirectUrl = 'https://ipm.ifas.ufl.edu/agricultural_ipm/tylcv_home_mgmt.shtml';
+                        break;
+                    case 'Tomato_Tomato_mosaic_virus':
+                        redirectUrl = 'https://www.missouribotanicalgarden.org/gardens-gardening/your-garden/help-for-the-home-gardener/advice-tips-resources/pests-and-problems/diseases/viruses/tobacco-mosaic-virus';
+                        break;
+                    case 'Tomato_healthy':
+                        console.log('Your Tomato is LOOKING GOOD :)');
+                        redirectUrl = 'https://www.healthline.com/nutrition/foods/tomatoes';
+                        break;
+                    default:
+                        console.log('Prediction does not match any known class.');
+                        break;
+                }
+
+                if (redirectUrl !== '') {
+                    const button = document.createElement('button');
+                    button.textContent = `Learn more about ${predictedClassName}`;
+                    button.addEventListener('click', function () {
+                        window.open(redirectUrl, '_blank');
+                    });
+                    resultArea.appendChild(button);
+                } else {
+                    console.log('No specific URL found for the predicted class.');
+                }
             } else {
                 alert('Prediction failed. Please try again.');
             }
