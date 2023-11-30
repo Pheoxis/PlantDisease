@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Plant Disease Detection</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="gradient-animation">
+    <h1>Plant Disease Detection</h1>
+    <button id="pingButton">Ping API</button>
+    <br><br>
+    <div id="uploadArea">
+        <p>Drag & drop an image here or click to select one.</p>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    </div>
+    <br>
+    <button id="uploadButton" style="display: none;">Upload Image</button>
+    <br><br>
+    <div id="resultArea" style="display: none;">
+        <h2>Result:</h2>
+        <p>Uploaded Image: <span id="uploadedImageName"></span></p>
+        <p>Prediction: <span id="predictedClass"></span></p>
+        <p>Confidence: <span id="confidence"></span></p>
+    </div>
+
+    <script>
+        const pingButton = document.getElementById('pingButton');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const uploadArea = document.getElementById('uploadArea');
+        const resultArea = document.getElementById('resultArea');
+        const uploadedImageName = document.getElementById('uploadedImageName');
+        const predictedClass = document.getElementById('predictedClass');
+        const confidence = document.getElementById('confidence');
+
+        const preventDefaults = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        const handleDrop = (e) => {
+            preventDefaults(e);
+            fileInput.files = e.dataTransfer.files;
+            uploadButton.style.display = 'block';
+        };
+
+        uploadArea.addEventListener('dragenter', preventDefaults);
+        uploadArea.addEventListener('dragover', preventDefaults);
+        uploadArea.addEventListener('drop', handleDrop);
+
+
+        pingButton.addEventListener('click', async () => {
+            const response = await fetch('http://localhost:8000/ping');
+            const data = await response.text();
+            console.log(data);
+            alert(data);
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            uploadButton.style.display = 'block';
+        });
+
+        uploadButton.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const response = await fetch('http://localhost:8000/predict', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.status === 200) {
+                const data = await response.json();
+                uploadedImageName.textContent = data.filename;
+                predictedClass.textContent = data.class;
+                confidence.textContent = data.confidence;
+                resultArea.style.display = 'block';
+
+                let predictedClassName = predictedClass.textContent;
+                let redirectUrl = '';
+                
+                switch (predictedClassName) {
+                    case 'Tomato_Bacterial_spot':
+                        redirectUrl = 'https://hort.extension.wisc.edu/articles/bacterial-spot-of-tomato/';
+                        break;
+                    case 'Tomato_Early_blight':
+                        redirectUrl = 'https://extension.umd.edu/resource/early-blight-tomatoes';
+                        break;
+                    case 'Tomato_Late_blight':
+                        redirectUrl = 'https://extension.wvu.edu/lawn-gardening-pests/plant-disease/fruit-vegetable-diseases/late-blight-tomatoes';
+                        break;
+                    case 'Tomato_Leaf_Mold':
+                        redirectUrl = 'https://www.lovethegarden.com/uk-en/garden-problem/tomato-leaf-mould';
+                        break;
+                    case 'Tomato_Septoria_leaf_spot':
+                        redirectUrl = 'https://www.missouribotanicalgarden.org/gardens-gardening/your-garden/help-for-the-home-gardener/advice-tips-resources/pests-and-problems/diseases/fungal-spots/septoria-leaf-spot-of-tomato';
+                        break;
+                    case 'Tomato_Target_Spot':
+                        redirectUrl = 'https://apps.lucidcentral.org/pppw_v10/text/web_full/entities/tomato_target_spot_163.htm';
+                        break;
+                    case 'Tomato_Tomato_YellowLeaf__Curl_Virus':
+                        redirectUrl = 'https://ipm.ifas.ufl.edu/agricultural_ipm/tylcv_home_mgmt.shtml';
+                        break;
+                    case 'Tomato_Tomato_mosaic_virus':
+                        redirectUrl = 'https://www.missouribotanicalgarden.org/gardens-gardening/your-garden/help-for-the-home-gardener/advice-tips-resources/pests-and-problems/diseases/viruses/tobacco-mosaic-virus';
+                        break;
+                    case 'Tomato_healthy':
+                        console.log('Your Tomato is LOOKING GOOD :)');
+                        redirectUrl = 'https://www.healthline.com/nutrition/foods/tomatoes';
+                        break;
+                    default:
+                        console.log('Prediction does not match any known class.');
+                        break;
+                }
+
+                if (redirectUrl !== '') {
+                    const button = document.createElement('button');
+                    button.textContent = `Learn more about ${predictedClassName}`;
+                    button.addEventListener('click', function () {
+                        window.open(redirectUrl, '_blank');
+                    });
+                    resultArea.appendChild(button);
+                } else {
+                    console.log('No specific URL found for the predicted class.');
+                }
+            } else {
+                alert('Prediction failed. Please try again.');
+            }
+        });
+    </script>
+</body>
+
+</html>
