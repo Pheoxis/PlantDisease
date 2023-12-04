@@ -7,7 +7,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./saved_models1:/app/saved_models1
+      - ./Disease_model.h5:/app/Disease_model.h5
 
   frontend:
     build:

@@ -21,10 +21,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-Model = tf.keras.models.load_model("./saved_models1/1")
+Model = tf.keras.models.load_model("./Disease_model.h5")
 
-CLASS_NAMES = ["Tomato__Target_Spot", "Tomato__Tomato_mosaic_virus", "Tomato__Tomato_YellowLeaf__Curl_Virus","Tomato_Bacterial_spot",
-                    "Tomato_Early_blight","Tomato_healthy","Tomato_Late_blight","Tomato_Leaf_Mold","Tomato_Septoria_leaf_spot"]
+CLASS_NAMES = ["Tomato_Bacterial_spot", "Tomato_Early_blight", "Tomato_Late_blight","Tomato_Leaf_Mold",                     
+               "Tomato_Septoria_leaf_spot", "TomatoTarget_Spot", "TomatoTomato_YellowLeafCurl_Virus", "TomatoTomato_mosaic_virus", "Tomato_healthy"]
 
 
 @app.get("/ping")
@@ -48,8 +48,8 @@ async def predict(
     confidence = np.max(prediction)
 
     return {
-        "class": predicted_class,
-        "confidence": float(confidence)
+        "class": predicted_class.replace('_', ' '),
+        "confidence": f'{round(float(confidence), 4) * 100}%'
     }
 
 if __name__ == "__main__":
