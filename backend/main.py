@@ -4,7 +4,8 @@ import uvicorn
 import numpy as np
 from io import BytesIO
 from PIL import Image
-import requests
+import tensorflow as tf
+
 
 app = FastAPI()
 
@@ -20,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-endpoint = "http://localhost:8501/v1/models/potatoes_model:predict"
+Model = tf.keras.models.load_model("./saved_models1/1")
 
 CLASS_NAMES = ["Tomato__Target_Spot", "Tomato__Tomato_mosaic_virus", "Tomato__Tomato_YellowLeaf__Curl_Virus","Tomato_Bacterial_spot",
                     "Tomato_Early_blight","Tomato_healthy","Tomato_Late_blight","Tomato_Leaf_Mold","Tomato_Septoria_leaf_spot"]
@@ -41,14 +42,9 @@ async def predict(
     image = read_file_as_image(await file.read())
     img_batch = np.expand_dims(image, 0)
 
-    json_data = {
-        "instances": img_batch.tolist()
-    }
+    prediction = Model.predict(img_batch)
 
-    response = requests.post(endpoint, json=json_data)
-    prediction = np.array(response.json()["predictions"][0])
-
-    predicted_class = CLASS_NAMES[np.argmax(prediction)]
+    predicted_class = CLASS_NAMES[np.argmax(prediction[0])]
     confidence = np.max(prediction)
 
     return {

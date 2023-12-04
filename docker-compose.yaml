@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:8000
+    volumes:
+      - ./saved_models1:/app/saved_models1
 
   frontend:
     build:
