@@ -1,0 +1,3 @@
+input_data:
+  type: kedro_datasets.pillow.ImageDataset
+  filepath: /home/kedro/uploaded_files/data.jpg

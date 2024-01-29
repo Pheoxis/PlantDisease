@@ -1,6 +1,16 @@
+# Pin problematic traitlets release -  https://github.com/jupyter/notebook/issues/7048
+ipython~=8.10; python_version >= '3.8'
+jupyterlab_server>=2.11.1, <2.16.0
+jupyterlab~=3.0, <3.6.0
+jupyter~=1.0
+kedro-telemetry>=0.3.1
+kedro~=0.19.1
+kedro[extras]>=0.19.1
+kedro_datasets
+Pillow
+traitlets<5.10.0
 fastapi
 uvicorn
 python-multipart
-pillow
 matplotlib
 numpy

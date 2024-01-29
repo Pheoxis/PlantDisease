@@ -1,6 +1,12 @@
+import os
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from kedro.framework.session import KedroSession
+from kedro.framework.startup import bootstrap_project
+from kedro.io import DataCatalog
+from pathlib import Path
 import uvicorn
+import time
 import numpy as np
 from io import BytesIO
 from PIL import Image
@@ -21,36 +27,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-Model = tf.keras.models.load_model("./Disease_model.h5")
-
-CLASS_NAMES = ["Tomato_Bacterial_spot", "Tomato_Early_blight", "Tomato_Late_blight","Tomato_Leaf_Mold",                     
-               "Tomato_Septoria_leaf_spot", "TomatoTarget_Spot", "TomatoTomato_YellowLeafCurl_Virus", "TomatoTomato_mosaic_virus", "Tomato_healthy"]
-
-
 @app.get("/ping")
 async def ping():
     return "Hello, I am alive"
 
-def read_file_as_image(data) -> np.ndarray:
-    image = np.array(Image.open(BytesIO(data)))
-    return image
-
 @app.post("/predict")
-async def predict(
-    file: UploadFile = File(...)
-):
-    image = read_file_as_image(await file.read())
-    img_batch = np.expand_dims(image, 0)
+async def predict(file: UploadFile = File(...)):
 
-    prediction = Model.predict(img_batch)
+    upload_folder = Path("uploaded_files")
+    upload_folder.mkdir(parents=True, exist_ok=True)
 
-    predicted_class = CLASS_NAMES[np.argmax(prediction[0])]
-    confidence = np.max(prediction)
+    file_path = "uploaded_files/data.jpg"
 
-    return {
-        "class": predicted_class.replace('_', ' '),
-        "confidence": f'{round(float(confidence), 4) * 100}%'
-    }
+    with open(file_path,"wb") as buffer:
+        while True:
+            data = await file.read(1024)
+            if not data:
+                break
+            buffer.write(data)
+
+    bootstrap_project(Path("/home/kedro"))
+    with KedroSession.create() as session:
+        context: KedroContext = session.load_context()
+        result = session.run(pipeline_name="backend")
+    
+    return result
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host='0.0.0.0', port=8000)
