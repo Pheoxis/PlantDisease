@@ -1,0 +1,29 @@
+[build-system]
+requires = [ "setuptools",]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "backend"
+readme = "README.md"
+dynamic = [ "dependencies", "version",]
+
+[project.scripts]
+backend = "backend.__main__:main"
+
+[tool.kedro]
+package_name = "backend"
+project_name = "backend"
+kedro_init_version = "0.19.1"
+tools = "[]"
+
+[project.entry-points."kedro.hooks"]
+
+[tool.setuptools.dynamic.dependencies]
+file = "requirements.txt"
+
+[tool.setuptools.dynamic.version]
+attr = "backend.__version__"
+
+[tool.setuptools.packages.find]
+where = [ "src",]
+namespaces = false
