@@ -12,7 +12,6 @@ from io import BytesIO
 from PIL import Image
 import tensorflow as tf
 
-
 app = FastAPI()
 
 origins = [
@@ -21,7 +20,7 @@ origins = [
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,8 +49,14 @@ async def predict(file: UploadFile = File(...)):
     with KedroSession.create() as session:
         context: KedroContext = session.load_context()
         result = session.run(pipeline_name="backend")
-    
-    return result
+    varclass = result.get("formatted_prediction").get("class")
+    confidence = result.get("formatted_prediction").get("confidence")
+    filenamev = file.filename
+    return {
+        'filename': filenamev,
+        'class': varclass,
+        'confidence': confidence
+    }
 
 
 if __name__ == "__main__":
