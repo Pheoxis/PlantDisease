@@ -30,14 +30,20 @@ def model_prediction(processed_image):
     return prediction
 
 def format_prediction(prediction):
-   
+
     predicted_index = np.argmax(prediction)
     class_names = ["Tomato_Bacterial_spot", "Tomato_Early_blight", "Tomato_Late_blight","Tomato_Leaf_Mold","Tomato_Septoria_leaf_spot", "TomatoTarget_Spot", "TomatoTomato_YellowLeafCurl_Virus", "TomatoTomato_mosaic_virus", "Tomato_healthy"]
     predicted_class = class_names[predicted_index]
     confidence = np.max(prediction)
-    formatted_output = f"Predicted class {predicted_class} with confidence {confidence}%"
+    print({
+        "class": predicted_class.replace('', ' '),
+        "confidence": f'{round(float(confidence), 4) * 100}%'
+    }   )
 
-    return format_prediction
+    return {
+        "class": predicted_class.replace('', ' '),
+        "confidence": f'{round(float(confidence), 4) * 100}%'
+    }
 
  
 def resize_image(image, size):
